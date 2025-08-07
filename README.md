@@ -1,81 +1,81 @@
 # Cursor Cloud Sync
 
-自動同步 Cursor 編輯器設定到 Google Drive 的 Python 工具。
+A Python tool to automatically sync Cursor editor settings to Google Drive.
 
-## 功能特點
+## Features
 
-- 🔄 自動同步 Cursor 設定到 Google Drive
-- 📦 完整備份設定檔案、快捷鍵、代碼片段等
-- 🔒 安全的 OAuth 2.0 認證
-- 🕒 定期自動同步（可設定間隔）
-- 🔔 macOS 系統通知支援
-- 🗂️ 自動清理舊備份檔案
-- 📱 跨平台支援 (macOS, Linux, Windows)
+- 🔄 Automatic sync of Cursor settings to Google Drive
+- 📦 Complete backup of settings, keybindings, code snippets, and more
+- 🔒 Secure OAuth 2.0 authentication
+- 🕒 Periodic automatic sync (configurable interval)
+- 🔔 macOS system notification support
+- 🗂️ Automatic cleanup of old backup files
+- 📱 Cross-platform support (macOS, Linux, Windows)
 
-## 支援的設定檔案
+## Supported Configuration Files
 
-- `settings.json` - 主要設定
-- `keybindings.json` - 快捷鍵設定
-- `snippets/` - 代碼片段
-- `extensions/` - 擴充功能設定
-- `workspaceStorage/` - 工作區設定
+- `settings.json` - Main settings
+- `keybindings.json` - Keybinding settings
+- `snippets/` - Code snippets
+- `extensions/` - Extension settings
+- `workspaceStorage/` - Workspace settings
 
-## 安裝
+## Installation
 
-1. 確保您有 Python 3.6 或更新版本
-2. 執行安裝腳本：
+1. Ensure you have Python 3.6 or newer
+2. Run the installation script:
 
 ```bash
 python setup.py
 ```
 
-安裝腳本將會：
-- 安裝所需的 Python 套件
-- 引導您設定 Google Drive API 憑證
-- 檢查 Cursor 設定檔路徑
-- 設定自動同步 (macOS)
+The installation script will:
+- Install required Python packages
+- Guide you through setting up Google Drive API credentials
+- Check Cursor settings file paths
+- Set up automatic sync (macOS)
 
-## Google Drive API 設定
+## Google Drive API Setup
 
-1. 前往 [Google Cloud Console](https://console.cloud.google.com/)
-2. 建立新專案或選擇現有專案
-3. 啟用 Google Drive API
-4. 建立憑證 (OAuth 2.0 客戶端 ID)
-5. 選擇應用程式類型為「桌面應用程式」
-6. 下載憑證檔案並重新命名為 `credentials.json`
-7. 將 `credentials.json` 放在專案目錄中
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the Google Drive API
+4. Create credentials (OAuth 2.0 Client ID)
+5. Select application type as "Desktop application"
+6. Download the credentials file and rename it to `credentials.json`
+7. Place `credentials.json` in the project directory
 
-## 使用方法
+## Usage
 
-### 基本命令
+### Basic Commands
 
 ```bash
-# 首次認證
+# First-time authentication
 python cursor_sync.py auth
 
-# 上傳設定到 Google Drive
+# Upload settings to Google Drive
 python cursor_sync.py up
 
-# 從 Google Drive 下載設定
+# Download settings from Google Drive
 python cursor_sync.py down
 
-# 驗證 Cursor 設定檔路徑
+# Validate Cursor settings file paths
 python cursor_sync.py validate
 ```
 
-### 自動同步
+### Automatic Sync
 
 ```bash
-# 執行一次同步
+# Run sync once
 python auto_sync.py --once
 
-# 開始自動同步 (持續執行)
+# Start automatic sync (continuous)
 python auto_sync.py
 ```
 
-### 自定義設定
+### Custom Configuration
 
-您可以修改 `config.json` 來自訂同步設定：
+You can modify `config.json` to customize sync settings:
 
 ```json
 {
@@ -103,12 +103,12 @@ python auto_sync.py
 }
 ```
 
-### 自定義 Cursor 路徑
+### Custom Cursor Paths
 
-如果您的 Cursor 設定檔案位於非標準位置，可以自定義路徑：
+If your Cursor configuration files are in non-standard locations, you can customize paths:
 
-1. **啟用自定義路徑**: 將 `cursor_paths.custom_enabled` 設為 `true`
-2. **設定路徑**: 在 `cursor_paths` 中指定各個檔案/目錄的路徑
+1. **Enable custom paths**: Set `cursor_paths.custom_enabled` to `true`
+2. **Set paths**: Specify paths for each file/directory in `cursor_paths`
 
 ```json
 {
@@ -123,80 +123,80 @@ python auto_sync.py
 }
 ```
 
-## macOS 自動同步設定
+## macOS Automatic Sync Setup
 
-對於 macOS 用戶，安裝腳本會自動建立 launchd 設定檔案，實現開機自動同步。
+For macOS users, the installation script will automatically create a launchd configuration file for startup automatic sync.
 
-### 手動管理 launchd 服務
+### Manual launchd Service Management
 
 ```bash
-# 載入服務
+# Load service
 launchctl load ~/Library/LaunchAgents/com.cursor.sync.plist
 
-# 卸載服務
+# Unload service
 launchctl unload ~/Library/LaunchAgents/com.cursor.sync.plist
 
-# 檢查服務狀態
+# Check service status
 launchctl list | grep cursor
 ```
 
-## 故障排除
+## Troubleshooting
 
-### 常見問題
+### Common Issues
 
-1. **憑證檔案錯誤**
-   - 確保 `credentials.json` 在專案目錄中
-   - 檢查檔案格式是否正確
+1. **Credentials file error**
+   - Ensure `credentials.json` is in the project directory
+   - Check if the file format is correct
 
-2. **找不到 Cursor 設定**
-   - 確保 Cursor 已安裝並至少執行過一次
-   - 檢查設定檔路徑是否正確
+2. **Cannot find Cursor settings**
+   - Ensure Cursor is installed and has been run at least once
+   - Check if the settings file path is correct
 
-3. **同步失敗**
-   - 檢查網路連接
-   - 重新執行 `python cursor_sync.py auth`
-   - 查看 `sync.log` 記錄檔
+3. **Sync failure**
+   - Check network connection
+   - Re-run `python cursor_sync.py auth`
+   - Check the `sync.log` file
 
-4. **路徑問題**
-   - 執行 `python cursor_sync.py validate` 檢查路徑狀態
-   - 確認 Cursor 設定檔案權限正確
-   - 檢查自定義路徑配置是否正確
+4. **Path issues**
+   - Run `python cursor_sync.py validate` to check path status
+   - Confirm Cursor settings file permissions are correct
+   - Check if custom path configuration is correct
 
-### 重設認證
+### Reset Authentication
 
-如果遇到認證問題，可以刪除 `token.json` 檔案並重新認證：
+If you encounter authentication issues, delete the `token.json` file and re-authenticate:
 
 ```bash
 rm token.json
 python cursor_sync.py auth
 ```
 
-## 檔案結構
+## File Structure
 
 ```
 cursor-cloud-sync/
-├── cursor_sync.py          # 主要同步邏輯
-├── auto_sync.py            # 自動同步腳本
-├── setup.py                # 安裝設定腳本
-├── config.json             # 設定檔案
-├── requirements.txt        # Python 套件依賴
-├── README.md              # 說明文件
-├── credentials.json       # Google API 憑證 (需要自行添加)
-├── token.json             # 認證 token (自動生成)
-└── sync.log               # 同步記錄檔
+├── cursor_sync.py          # Main sync logic
+├── auto_sync.py            # Automatic sync script
+├── setup.py                # Installation setup script
+├── config.json             # Configuration file
+├── requirements.txt        # Python package dependencies
+├── README.md              # Documentation
+├── credentials.json       # Google API credentials (add yourself)
+├── token.json             # Authentication token (auto-generated)
+└── sync.log               # Sync log file
 ```
 
 ## Security
 
-- 不要將 `credentials.json` 和 `token.json` 提交到版本控制
-- 定期檢查 Google Drive 中的備份檔案
-- 建議定期更新 Google API 憑證
+- Do not commit `credentials.json` and `token.json` to version control
+- Regularly check backup files in Google Drive
+- Recommended to update Google API credentials regularly
 
 To report security vulnerabilities, please see our [Security Policy](SECURITY.md).
 
-## 授權
+## License
 
-此專案使用 MIT 授權。
+This project is licensed under the MIT License.
 
 ## Contributing
 
@@ -209,10 +209,10 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 
-## 更新日誌
+## Changelog
 
 ### v1.0.0
-- 初始版本
-- 支援基本同步功能
-- macOS 自動同步支援
-- 系統通知整合
+- Initial release
+- Basic sync functionality support
+- macOS automatic sync support
+- System notification integration

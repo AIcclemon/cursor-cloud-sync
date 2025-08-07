@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-自動化同步腳本
-定期將 Cursor 設定同步到 Google Drive
+Automated Sync Script
+Periodically sync Cursor settings to Google Drive
 """
 
 import os
@@ -19,12 +19,12 @@ class AutoSyncManager:
         self._setup_logging()
         
     def _load_config(self):
-        """載入設定檔"""
+        """Load configuration file"""
         try:
             with open(self.config_path, 'r') as f:
                 return json.load(f)
         except FileNotFoundError:
-            print(f"設定檔 {self.config_path} 不存在，使用預設設定")
+            print(f"Configuration file {self.config_path} does not exist, using default settings")
             return {
                 "sync_settings": {
                     "auto_sync": False,
@@ -47,7 +47,7 @@ class AutoSyncManager:
             }
     
     def _setup_logging(self):
-        """設定記錄"""
+        """Setup logging"""
         log_file = self.config['paths']['log_file']
         logging.basicConfig(
             level=logging.INFO,
@@ -60,25 +60,25 @@ class AutoSyncManager:
         self.logger = logging.getLogger(__name__)
     
     def _send_notification(self, title, message):
-        """發送系統通知"""
+        """Send system notification"""
         if not self.config['notification_settings']['enable_notifications']:
             return
         
         try:
-            # macOS 通知
+            # macOS notification
             os.system(f'osascript -e \'display notification "{message}" with title "{title}"\'')
         except:
             pass
     
     def _cleanup_old_backups(self, sync_manager):
-        """清理舊的備份檔案"""
+        """Clean up old backup files"""
         max_backups = self.config['sync_settings']['max_backups']
         folder_name = self.config['sync_settings']['backup_folder_name']
         
         try:
             folder_id = sync_manager._get_or_create_folder(folder_name)
             
-            # 搜尋所有備份檔案
+            # Search for all backup files
             results = sync_manager.service.files().list(
                 q=f"parents='{folder_id}' and name contains 'cursor_backup'",
                 orderBy='createdTime desc',
@@ -87,82 +87,82 @@ class AutoSyncManager:
             
             files = results.get('files', [])
             
-            # 如果超過最大備份數量，刪除舊的備份
+            # If exceeding maximum backup count, delete old backups
             if len(files) > max_backups:
                 files_to_delete = files[max_backups:]
                 for file_to_delete in files_to_delete:
                     sync_manager.service.files().delete(fileId=file_to_delete['id']).execute()
-                    self.logger.info(f"已刪除舊備份: {file_to_delete['name']}")
+                    self.logger.info(f"Deleted old backup: {file_to_delete['name']}")
         
         except Exception as e:
-            self.logger.error(f"清理舊備份時發生錯誤: {str(e)}")
+            self.logger.error(f"Error occurred while cleaning up old backups: {str(e)}")
     
     def sync_once(self):
-        """執行一次同步"""
+        """Execute sync once"""
         try:
             credentials_file = self.config['paths']['credentials_file']
             token_file = self.config['paths']['token_file']
             
             sync_manager = CursorSyncManager(credentials_file, token_file)
             
-            # 檢查憑證檔案是否存在
+            # Check if credentials file exists
             if not os.path.exists(credentials_file):
-                self.logger.error(f"憑證檔案 {credentials_file} 不存在")
+                self.logger.error(f"Credentials file {credentials_file} does not exist")
                 return False
             
-            # 認證
+            # Authentication
             sync_manager.authenticate()
             
-            # 執行同步
+            # Execute sync
             file_id = sync_manager.sync_up()
             
-            # 清理舊備份
+            # Clean up old backups
             self._cleanup_old_backups(sync_manager)
             
-            self.logger.info("同步成功完成")
+            self.logger.info("Sync completed successfully")
             
             if self.config['notification_settings']['success_notification']:
-                self._send_notification("Cursor 同步", "設定已成功同步到 Google Drive")
+                self._send_notification("Cursor Sync", "Settings successfully synced to Google Drive")
             
             return True
             
         except Exception as e:
-            self.logger.error(f"同步失敗: {str(e)}")
+            self.logger.error(f"Sync failed: {str(e)}")
             
             if self.config['notification_settings']['error_notification']:
-                self._send_notification("Cursor 同步錯誤", f"同步失敗: {str(e)}")
+                self._send_notification("Cursor Sync Error", f"Sync failed: {str(e)}")
             
             return False
     
     def start_auto_sync(self):
-        """開始自動同步"""
+        """Start automatic sync"""
         if not self.config['sync_settings']['auto_sync']:
-            self.logger.info("自動同步已關閉")
+            self.logger.info("Automatic sync is disabled")
             return
         
         interval = self.config['sync_settings']['sync_interval_minutes'] * 60
         
-        self.logger.info(f"開始自動同步，間隔: {interval/60} 分鐘")
+        self.logger.info(f"Starting automatic sync, interval: {interval/60} minutes")
         
         while True:
             try:
                 self.sync_once()
                 time.sleep(interval)
             except KeyboardInterrupt:
-                self.logger.info("自動同步已停止")
+                self.logger.info("Automatic sync stopped")
                 break
             except Exception as e:
-                self.logger.error(f"自動同步發生錯誤: {str(e)}")
+                self.logger.error(f"Automatic sync error occurred: {str(e)}")
                 time.sleep(interval)
 
 def main():
     import argparse
     
-    parser = argparse.ArgumentParser(description='Cursor 自動同步工具')
+    parser = argparse.ArgumentParser(description='Cursor Automatic Sync Tool')
     parser.add_argument('--config', default='config.json',
-                       help='設定檔路徑')
+                       help='Configuration file path')
     parser.add_argument('--once', action='store_true',
-                       help='只執行一次同步')
+                       help='Execute sync only once')
     
     args = parser.parse_args()
     

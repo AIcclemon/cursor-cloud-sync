@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Cursor 設定同步工具
-自動同步 Cursor 編輯器設定到 Google Drive
+Cursor Configuration Sync Tool
+Automatically sync Cursor editor settings to Google Drive
 """
 
 import os
@@ -33,8 +33,8 @@ class CursorSyncManager:
         self.cursor_config_paths = self._get_cursor_config_paths()
         
     def _get_cursor_config_paths(self):
-        """獲取 Cursor 設定檔路徑"""
-        # 嘗試從配置檔案讀取自定義路徑
+        """Get Cursor configuration file paths"""
+        # Try to read custom paths from configuration file
         try:
             if os.path.exists(self.config_path):
                 with open(self.config_path, 'r', encoding='utf-8') as f:
@@ -42,7 +42,7 @@ class CursorSyncManager:
                     cursor_paths = config.get('cursor_paths', {})
                     
                     if cursor_paths.get('custom_enabled', False):
-                        # 使用自定義路徑
+                        # Use custom paths
                         custom_paths = {}
                         for key in ['settings', 'keybindings', 'snippets', 'extensions', 'workspaceStorage']:
                             path = cursor_paths.get(key)
@@ -52,13 +52,13 @@ class CursorSyncManager:
                         if custom_paths:
                             return custom_paths
         except Exception as e:
-            print(f"讀取配置檔案時發生錯誤: {e}")
+            print(f"Error reading configuration file: {e}")
         
-        # 使用預設路徑（根據作業系統）
+        # Use default paths (based on operating system)
         return self._get_default_cursor_paths()
     
     def validate_paths(self):
-        """驗證 Cursor 設定檔路徑"""
+        """Validate Cursor configuration file paths"""
         validation_results = {}
         
         for name, path in self.cursor_config_paths.items():
@@ -76,13 +76,13 @@ class CursorSyncManager:
                 validation_results[name]['is_file'] = os.path.isfile(path)
                 validation_results[name]['is_dir'] = os.path.isdir(path)
                 
-                # 檢查寫入權限
+                # Check write permissions
                 if os.path.isfile(path):
                     validation_results[name]['writable'] = os.access(path, os.W_OK)
                 elif os.path.isdir(path):
                     validation_results[name]['writable'] = os.access(path, os.W_OK)
                 else:
-                    # 檢查父目錄的寫入權限
+                    # Check parent directory write permissions
                     parent_dir = os.path.dirname(path)
                     if os.path.exists(parent_dir):
                         validation_results[name]['writable'] = os.access(parent_dir, os.W_OK)
@@ -90,10 +90,10 @@ class CursorSyncManager:
         return validation_results
     
     def print_path_validation(self):
-        """打印路徑驗證結果"""
+        """Print path validation results"""
         validation_results = self.validate_paths()
         
-        print("\n路徑驗證結果:")
+        print("\nPath Validation Results:")
         print("=" * 50)
         
         for name, result in validation_results.items():
@@ -101,18 +101,18 @@ class CursorSyncManager:
             print(f"{status} {name}: {result['path']}")
             
             if result['exists']:
-                type_str = "檔案" if result['is_file'] else "目錄" if result['is_dir'] else "未知"
-                read_str = "可讀" if result['readable'] else "不可讀"
-                write_str = "可寫" if result['writable'] else "不可寫"
-                print(f"   類型: {type_str}, 權限: {read_str}, {write_str}")
+                type_str = "File" if result['is_file'] else "Directory" if result['is_dir'] else "Unknown"
+                read_str = "Readable" if result['readable'] else "Not readable"
+                write_str = "Writable" if result['writable'] else "Not writable"
+                print(f"   Type: {type_str}, Permissions: {read_str}, {write_str}")
             else:
-                print(f"   狀態: 不存在")
+                print(f"   Status: Does not exist")
             print()
         
         return validation_results
     
     def _get_default_cursor_paths(self):
-        """獲取預設的 Cursor 設定檔路徑"""
+        """Get default Cursor configuration file paths"""
         system = platform.system().lower()
         
         if system == 'darwin':  # macOS
@@ -140,10 +140,10 @@ class CursorSyncManager:
                 'workspaceStorage': os.path.expanduser('~/AppData/Roaming/Cursor/User/workspaceStorage/')
             }
         else:
-            raise Exception(f"不支援的作業系統: {system}")
+            raise Exception(f"Unsupported operating system: {system}")
     
     def authenticate(self):
-        """Google Drive API 認證"""
+        """Google Drive API authentication"""
         creds = None
         
         if os.path.exists(self.token_path):
@@ -164,17 +164,17 @@ class CursorSyncManager:
         return True
     
     def create_backup_archive(self):
-        """建立 Cursor 設定備份檔案"""
+        """Create Cursor configuration backup file"""
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         backup_filename = f'cursor_backup_{timestamp}.zip'
         
-        # 使用 NamedTemporaryFile 而不是 TemporaryDirectory，避免檔案被自動刪除
+        # Use NamedTemporaryFile instead of TemporaryDirectory to avoid automatic file deletion
         temp_file = tempfile.NamedTemporaryFile(suffix='.zip', delete=False)
         backup_path = temp_file.name
-        temp_file.close()  # 關閉檔案控制代碼，讓 zipfile 可以使用
+        temp_file.close()  # Close file handle so zipfile can use it
         
         with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            # 備份設定檔
+            # Backup configuration files
             for config_name, config_path in self.cursor_config_paths.items():
                 if os.path.exists(config_path):
                     if os.path.isfile(config_path):
@@ -187,7 +187,7 @@ class CursorSyncManager:
                                                      os.path.relpath(file_path, config_path))
                                 zipf.write(file_path, arcname)
             
-            # 添加元資料
+            # Add metadata
             metadata = {
                 'timestamp': timestamp,
                 'platform': os.name,
@@ -202,9 +202,9 @@ class CursorSyncManager:
         return backup_path, backup_filename
     
     def _get_cursor_version(self):
-        """獲取 Cursor 版本（如果可能）"""
+        """Get Cursor version (if possible)"""
         try:
-            # 嘗試從設定檔中獲取版本資訊
+            # Try to get version information from settings file
             settings_path = self.cursor_config_paths.get('settings')
             if os.path.exists(settings_path):
                 with open(settings_path, 'r') as f:
@@ -215,14 +215,14 @@ class CursorSyncManager:
         return 'unknown'
     
     def upload_to_drive(self, file_path, custom_filename=None, folder_name='Cursor Backups'):
-        """上傳備份檔案到 Google Drive"""
+        """Upload backup file to Google Drive"""
         if not self.service:
-            raise Exception("請先進行 Google Drive 認證")
+            raise Exception("Please authenticate with Google Drive first")
         
-        # 查找或建立資料夾
+        # Find or create folder
         folder_id = self._get_or_create_folder(folder_name)
         
-        # 上傳檔案 - 使用自定義檔名或原始檔名
+        # Upload file - use custom filename or original filename
         display_name = custom_filename if custom_filename else os.path.basename(file_path)
         file_metadata = {
             'name': display_name,
@@ -237,12 +237,12 @@ class CursorSyncManager:
             fields='id'
         ).execute()
         
-        print(f"檔案已上傳到 Google Drive，ID: {file.get('id')}")
+        print(f"File uploaded to Google Drive, ID: {file.get('id')}")
         return file.get('id')
     
     def _get_or_create_folder(self, folder_name):
-        """獲取或建立 Google Drive 資料夾"""
-        # 搜尋現有資料夾
+        """Get or create Google Drive folder"""
+        # Search for existing folder
         results = self.service.files().list(
             q=f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder'",
             spaces='drive',
@@ -254,7 +254,7 @@ class CursorSyncManager:
         if folders:
             return folders[0]['id']
         
-        # 建立新資料夾
+        # Create new folder
         folder_metadata = {
             'name': folder_name,
             'mimeType': 'application/vnd.google-apps.folder'
@@ -265,17 +265,17 @@ class CursorSyncManager:
             fields='id'
         ).execute()
         
-        print(f"已建立資料夾: {folder_name}")
+        print(f"Created folder: {folder_name}")
         return folder.get('id')
     
     def download_latest_backup(self, folder_name='Cursor Backups'):
-        """下載最新的備份檔案"""
+        """Download the latest backup file"""
         if not self.service:
-            raise Exception("請先進行 Google Drive 認證")
+            raise Exception("Please authenticate with Google Drive first")
         
         folder_id = self._get_or_create_folder(folder_name)
         
-        # 搜尋備份檔案
+        # Search for backup files
         results = self.service.files().list(
             q=f"parents='{folder_id}' and name contains 'cursor_backup'",
             orderBy='createdTime desc',
@@ -285,14 +285,14 @@ class CursorSyncManager:
         files = results.get('files', [])
         
         if not files:
-            print("沒有找到備份檔案")
+            print("No backup files found")
             return None
         
         latest_file = files[0]
         file_id = latest_file['id']
         filename = latest_file['name']
         
-        # 下載檔案
+        # Download file
         request = self.service.files().get_media(fileId=file_id)
         
         with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as temp_file:
@@ -300,26 +300,26 @@ class CursorSyncManager:
             done = False
             while done is False:
                 status, done = downloader.next_chunk()
-                print(f"下載進度: {int(status.progress() * 100)}%")
+                print(f"Download progress: {int(status.progress() * 100)}%")
             
-            print(f"已下載: {filename}")
+            print(f"Downloaded: {filename}")
             return temp_file.name
     
     def restore_from_backup(self, backup_path):
-        """從備份檔案恢復設定"""
+        """Restore settings from backup file"""
         if not os.path.exists(backup_path):
-            raise Exception(f"備份檔案不存在: {backup_path}")
+            raise Exception(f"Backup file does not exist: {backup_path}")
         
         with zipfile.ZipFile(backup_path, 'r') as zipf:
             with tempfile.TemporaryDirectory() as temp_dir:
                 zipf.extractall(temp_dir)
                 
-                # 恢復各個設定檔
+                # Restore each configuration file
                 for config_name, config_path in self.cursor_config_paths.items():
                     backup_config_path = os.path.join(temp_dir, config_name)
                     
                     if os.path.exists(backup_config_path):
-                        # 備份當前設定
+                        # Backup current settings
                         if os.path.exists(config_path):
                             backup_current = f"{config_path}.backup_{int(time.time())}"
                             if os.path.isfile(config_path):
@@ -327,7 +327,7 @@ class CursorSyncManager:
                             else:
                                 shutil.copytree(config_path, backup_current)
                         
-                        # 恢復設定
+                        # Restore settings
                         if os.path.isfile(backup_config_path):
                             os.makedirs(os.path.dirname(config_path), exist_ok=True)
                             shutil.copy2(backup_config_path, config_path)
@@ -336,53 +336,53 @@ class CursorSyncManager:
                                 shutil.rmtree(config_path)
                             shutil.copytree(backup_config_path, config_path)
                         
-                        print(f"已恢復: {config_name}")
+                        print(f"Restored: {config_name}")
     
     def sync_up(self):
-        """同步到雲端"""
-        print("開始同步 Cursor 設定到 Google Drive...")
+        """Sync to cloud"""
+        print("Starting to sync Cursor settings to Google Drive...")
         
-        # 建立備份檔案
+        # Create backup file
         backup_path, backup_filename = self.create_backup_archive()
-        print(f"已建立備份檔案: {backup_path}")
+        print(f"Created backup file: {backup_path}")
         
-        # 上傳到 Google Drive （使用正確的檔名）
+        # Upload to Google Drive (using correct filename)
         file_id = self.upload_to_drive(backup_path, backup_filename)
         
-        # 清理臨時檔案
+        # Clean up temporary file
         os.unlink(backup_path)
         
-        print("同步完成！")
+        print("Sync completed!")
         return file_id
     
     def sync_down(self):
-        """從雲端同步"""
-        print("開始從 Google Drive 同步 Cursor 設定...")
+        """Sync from cloud"""
+        print("Starting to sync Cursor settings from Google Drive...")
         
-        # 下載最新備份
+        # Download latest backup
         backup_path = self.download_latest_backup()
         
         if backup_path:
-            # 恢復設定
+            # Restore settings
             self.restore_from_backup(backup_path)
             
-            # 清理臨時檔案
+            # Clean up temporary file
             os.unlink(backup_path)
             
-            print("同步完成！")
+            print("Sync completed!")
         else:
-            print("沒有找到備份檔案")
+            print("No backup files found")
 
 def main():
     import argparse
     
-    parser = argparse.ArgumentParser(description='Cursor 設定同步工具')
+    parser = argparse.ArgumentParser(description='Cursor Configuration Sync Tool')
     parser.add_argument('action', choices=['up', 'down', 'auth', 'validate'], 
-                       help='動作: up=上傳, down=下載, auth=認證, validate=驗證路徑')
+                       help='Action: up=upload, down=download, auth=authenticate, validate=validate paths')
     parser.add_argument('--credentials', default='credentials.json',
-                       help='Google API 憑證檔案路徑')
+                       help='Google API credentials file path')
     parser.add_argument('--token', default='token.json',
-                       help='認證 token 檔案路徑')
+                       help='Authentication token file path')
     
     args = parser.parse_args()
     
@@ -394,9 +394,9 @@ def main():
     
     if args.action == 'auth':
         if sync_manager.authenticate():
-            print("認證成功！")
+            print("Authentication successful!")
         else:
-            print("認證失敗！")
+            print("Authentication failed!")
     
     elif args.action == 'up':
         sync_manager.authenticate()

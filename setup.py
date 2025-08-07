@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-設定腳本
-協助用戶設定 Cursor 同步環境
+Setup Script
+Helps users set up Cursor sync environment
 """
 
 import os
@@ -12,50 +12,50 @@ import json
 from pathlib import Path
 
 def install_requirements():
-    """安裝所需的 Python 套件"""
-    print("正在安裝所需套件...")
+    """Install required Python packages"""
+    print("Installing required packages...")
     try:
-        # 檢查是否在虛擬環境中
+        # Check if in virtual environment
         in_venv = hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
         
         if in_venv:
-            # 在虛擬環境中，不使用 --user 參數
+            # In virtual environment, don't use --user flag
             subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
         else:
-            # 不在虛擬環境中，使用 --user 參數
+            # Not in virtual environment, use --user flag
             subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--user', '-r', 'requirements.txt'])
         
-        print("✓ 套件安裝完成")
+        print("✓ Package installation complete")
         return True
     except subprocess.CalledProcessError:
-        print("✗ 套件安裝失敗")
+        print("✗ Package installation failed")
         return False
 
 def setup_google_credentials():
-    """設定 Google API 憑證"""
-    print("\n設定 Google Drive API 憑證...")
-    print("請按照以下步驟操作：")
-    print("1. 前往 Google Cloud Console: https://console.cloud.google.com/")
-    print("2. 建立新專案或選擇現有專案")
-    print("3. 啟用 Google Drive API")
-    print("4. 建立憑證 (OAuth 2.0 客戶端 ID)")
-    print("5. 選擇應用程式類型為 '桌面應用程式'")
-    print("6. 下載憑證檔案並重新命名為 'credentials.json'")
-    print("7. 將 credentials.json 放在此專案目錄中")
+    """Setup Google API credentials"""
+    print("\nSetting up Google Drive API credentials...")
+    print("Please follow these steps:")
+    print("1. Go to Google Cloud Console: https://console.cloud.google.com/")
+    print("2. Create a new project or select an existing one")
+    print("3. Enable the Google Drive API")
+    print("4. Create credentials (OAuth 2.0 Client ID)")
+    print("5. Select application type as 'Desktop application'")
+    print("6. Download the credentials file and rename it to 'credentials.json'")
+    print("7. Place credentials.json in this project directory")
     
     credentials_path = 'credentials.json'
     
     while not os.path.exists(credentials_path):
-        input("\n按 Enter 鍵繼續檢查 credentials.json 是否存在...")
+        input("\nPress Enter to continue checking if credentials.json exists...")
         if not os.path.exists(credentials_path):
-            print(f"找不到 {credentials_path}，請確認檔案位置正確")
+            print(f"Cannot find {credentials_path}, please verify the file location is correct")
     
-    print("✓ 找到憑證檔案")
+    print("✓ Found credentials file")
     return True
 
 def create_launchd_plist():
-    """建立 macOS launchd 設定檔案"""
-    print("\n建立自動同步設定...")
+    """Create macOS launchd configuration file"""
+    print("\nCreating automatic sync configuration...")
     
     current_dir = os.getcwd()
     python_path = sys.executable
@@ -93,17 +93,17 @@ def create_launchd_plist():
     with open(plist_path, 'w') as f:
         f.write(plist_content)
     
-    print(f"✓ 已建立 launchd 設定檔: {plist_path}")
+    print(f"✓ Created launchd configuration file: {plist_path}")
     
-    # 詢問是否要啟用自動同步
-    enable_auto = input("\n是否要啟用自動同步？(y/N): ").lower().strip()
+    # Ask if user wants to enable automatic sync
+    enable_auto = input("\nDo you want to enable automatic sync? (y/N): ").lower().strip()
     
     if enable_auto == 'y' or enable_auto == 'yes':
         try:
             subprocess.run(['launchctl', 'load', plist_path], check=True)
-            print("✓ 自動同步已啟用")
+            print("✓ Automatic sync enabled")
             
-            # 修改 config.json 中的 auto_sync 設定
+            # Update auto_sync setting in config.json
             config_path = 'config.json'
             if os.path.exists(config_path):
                 with open(config_path, 'r') as f:
@@ -114,15 +114,15 @@ def create_launchd_plist():
                 with open(config_path, 'w') as f:
                     json.dump(config, f, indent=2)
                 
-                print("✓ 已更新設定檔")
+                print("✓ Configuration file updated")
         except subprocess.CalledProcessError:
-            print("✗ 啟用自動同步失敗")
+            print("✗ Failed to enable automatic sync")
     
     return True
 
 def test_cursor_paths():
-    """測試 Cursor 設定路徑"""
-    print("\n檢查 Cursor 設定檔路徑...")
+    """Test Cursor settings paths"""
+    print("\nChecking Cursor settings file paths...")
     
     from cursor_sync import CursorSyncManager
     
@@ -134,56 +134,56 @@ def test_cursor_paths():
             found_paths.append((name, path))
             print(f"✓ {name}: {path}")
         else:
-            print(f"✗ {name}: {path} (不存在)")
+            print(f"✗ {name}: {path} (does not exist)")
     
     if found_paths:
-        print(f"\n找到 {len(found_paths)} 個設定檔案/目錄")
+        print(f"\nFound {len(found_paths)} configuration files/directories")
         return True
     else:
-        print("\n未找到 Cursor 設定檔案")
-        print("請確認 Cursor 已安裝並至少執行過一次")
+        print("\nNo Cursor configuration files found")
+        print("Please ensure Cursor is installed and has been run at least once")
         return False
 
 def main():
-    print("Cursor Cloud Sync 安裝程式")
+    print("Cursor Cloud Sync Installation")
     print("=" * 40)
     
-    # 檢查 Python 版本
+    # Check Python version
     if sys.version_info < (3, 6):
-        print("需要 Python 3.6 或更新版本")
+        print("Python 3.6 or newer required")
         sys.exit(1)
     
-    # 安裝套件
+    # Install packages
     if not install_requirements():
         sys.exit(1)
     
-    # 設定 Google 憑證
+    # Setup Google credentials
     if not setup_google_credentials():
         sys.exit(1)
     
-    # 測試 Cursor 路徑
+    # Test Cursor paths
     if not test_cursor_paths():
-        print("\n警告: 未找到 Cursor 設定檔案")
-        print("請確認 Cursor 已安裝並至少執行過一次")
+        print("\nWarning: No Cursor configuration files found")
+        print("Please ensure Cursor is installed and has been run at least once")
     
-    # 建立 launchd 設定
+    # Create launchd configuration
     if sys.platform == 'darwin':  # macOS
         create_launchd_plist()
     
     print("\n" + "=" * 40)
-    print("設定完成！")
-    print("\n使用方法:")
-    print("1. 手動同步: python cursor_sync.py up")
-    print("2. 下載設定: python cursor_sync.py down")
-    print("3. 重新認證: python cursor_sync.py auth")
-    print("4. 驗證路徑: python cursor_sync.py validate")
-    print("5. 執行一次同步: python auto_sync.py --once")
-    print("6. 開始自動同步: python auto_sync.py")
+    print("Setup complete!")
+    print("\nUsage:")
+    print("1. Manual sync: python cursor_sync.py up")
+    print("2. Download settings: python cursor_sync.py down")
+    print("3. Re-authenticate: python cursor_sync.py auth")
+    print("4. Validate paths: python cursor_sync.py validate")
+    print("5. Run sync once: python auto_sync.py --once")
+    print("6. Start automatic sync: python auto_sync.py")
     
-    print("\n注意事項:")
-    print("- 首次使用需要進行 Google 認證")
-    print("- 設定檔案會被打包上傳到 Google Drive")
-    print("- 可以在 config.json 中調整同步設定")
+    print("\nImportant notes:")
+    print("- First-time use requires Google authentication")
+    print("- Configuration files will be packaged and uploaded to Google Drive")
+    print("- You can adjust sync settings in config.json")
 
 if __name__ == '__main__':
     main()
