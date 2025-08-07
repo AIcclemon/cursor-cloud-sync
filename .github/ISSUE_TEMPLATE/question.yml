@@ -1,0 +1,83 @@
+name: Question or Support
+description: Ask a question or get help using Cursor Cloud Sync
+title: "[Question]: "
+labels: ["question", "support"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about using Cursor Cloud Sync? We're here to help!
+        
+        **Note**: For general discussions, consider using [GitHub Discussions](https://github.com/AIcclemon/cursor-cloud-sync/discussions) instead.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight Checklist
+      description: Please confirm the following before asking your question.
+      options:
+        - label: I have read the README and documentation
+          required: true
+        - label: I have searched existing issues and discussions
+          required: true
+        - label: I have checked the troubleshooting section in the README
+          required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know?
+      placeholder: I want to understand how to... / I'm trying to... / I'm confused about...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Please provide context about what you're trying to accomplish
+      placeholder: I'm trying to... / My goal is... / I want to achieve...
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What Have You Tried?
+      description: What steps have you already attempted?
+      placeholder: I tried... / I looked at... / I attempted to...
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - macOS
+        - Windows
+        - Linux (Ubuntu)
+        - Linux (other)
+        - Other
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python Version
+      description: What version of Python are you using?
+      placeholder: "e.g., 3.9.7"
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant Configuration
+      description: Please share any relevant configuration (remove sensitive information!)
+      render: json
+      placeholder: Paste your config.json here (remove sensitive data)...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that might be helpful
+      placeholder: Add any additional context here...

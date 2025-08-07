@@ -186,19 +186,28 @@ cursor-cloud-sync/
 └── sync.log               # 同步記錄檔
 ```
 
-## 安全性注意事項
+## Security
 
 - 不要將 `credentials.json` 和 `token.json` 提交到版本控制
 - 定期檢查 Google Drive 中的備份檔案
 - 建議定期更新 Google API 憑證
 
+To report security vulnerabilities, please see our [Security Policy](SECURITY.md).
+
 ## 授權
 
 此專案使用 MIT 授權。
 
-## 貢獻
+## Contributing
 
-歡迎提交 Issue 和 Pull Request！
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on how to:
+
+- 🐛 [Report bugs](https://github.com/AIcclemon/cursor-cloud-sync/issues/new?template=bug_report.yml)
+- 💡 [Request features](https://github.com/AIcclemon/cursor-cloud-sync/issues/new?template=feature_request.yml)
+- ❓ [Ask questions](https://github.com/AIcclemon/cursor-cloud-sync/issues/new?template=question.yml)
+- 🔧 Submit code changes
+
+Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 
 ## 更新日誌
 
