@@ -1,0 +1,28 @@
+{
+  "sync_settings": {
+    "auto_sync": true,
+    "sync_interval_minutes": 720,
+    "backup_folder_name": "Cursor Backups",
+    "max_backups": 10,
+    "include_extensions": true,
+    "include_workspace_storage": false
+  },
+  "notification_settings": {
+    "enable_notifications": true,
+    "success_notification": true,
+    "error_notification": true
+  },
+  "paths": {
+    "credentials_file": "credentials.json",
+    "token_file": "token.json",
+    "log_file": "sync.log"
+  },
+  "cursor_paths": {
+    "custom_enabled": false,
+    "settings": null,
+    "keybindings": null,
+    "snippets": null,
+    "extensions": null,
+    "workspaceStorage": null
+  }
+}
